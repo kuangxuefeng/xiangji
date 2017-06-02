@@ -1,0 +1,29 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="${relativePackage}.${activityClass}" >
+
+    <com.kuang.xiangji.MySurfaceView
+        android:id="@+id/my_camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/tv_no_camera"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="未检查到本地有摄像头" />
+    
+    <TextView
+        android:id="@+id/tv_time"
+        android:textSize="30sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="#FF0000"
+        android:gravity="center"
+        android:text="2017" />
+
+</RelativeLayout>
