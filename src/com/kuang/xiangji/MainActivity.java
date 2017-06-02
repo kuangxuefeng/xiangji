@@ -39,8 +39,8 @@ public class MainActivity extends Activity implements OnClickListener,
 
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	SimpleDateFormat sdfFile = new SimpleDateFormat("yyyyMMddHHmmss");
-	
-	//(176*144,320*240,352*288,480*360,640*480) 
+
+	// (176*144,320*240,352*288,480*360,640*480)
 	private int imageW = 640;
 	private int imageH = 480;
 
@@ -65,13 +65,15 @@ public class MainActivity extends Activity implements OnClickListener,
 		public void onPictureTaken(byte[] data, Camera camera) {
 			// TODO Auto-generated method stub
 			try {// 获得图片
-				Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
-				Log.e(TAG, "bm="+bm);
+				Toast.makeText(MainActivity.this, "截屏",
+						Toast.LENGTH_LONG).show();
+				Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
+						data.length);
+				Log.e(TAG, "bm=" + bm);
 				myCamera.startPreview();// 开启预览
 				isClicked = false;
 
 				saveImage(bm);
-
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -148,7 +150,7 @@ public class MainActivity extends Activity implements OnClickListener,
 
 		Paint paint = new Paint();
 		Log.e(TAG, "Bmp.getHeight()=" + Bmp.getHeight());
-		paint.setTextSize(100);
+		paint.setTextSize(Bmp.getHeight() / 20);
 		paint.setColor(Color.RED);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
@@ -179,7 +181,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				fos.flush();
 				fos.close();
 
-				Toast.makeText(this, "截屏文件已保存至"+getBasePath()+"下",
+				Toast.makeText(this, "截屏文件已保存至" + getBasePath() + "下",
 						Toast.LENGTH_LONG).show();
 			}
 
@@ -188,7 +190,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		}
 	}
 
-	private String getBasePath(){
+	private String getBasePath() {
 		String savePath = getSDCardPath() + "/feng/ScreenImage";
 		return savePath;
 	}
