@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -19,6 +21,7 @@ import android.graphics.PorterDuffXfermode;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
+import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -28,6 +31,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +54,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	String filePath = "/sdcard/wjh.jpg";// 照片保存路径
 	boolean isClicked = false;// 是否点击标识
 	private TextView tv_time;
+	private Button btn_change;
 
 	/**
 	 * 预览的参数：myParameters.setPreviewSize(1280, 720）
@@ -65,10 +70,8 @@ public class MainActivity extends Activity implements OnClickListener,
 		public void onPictureTaken(byte[] data, Camera camera) {
 			// TODO Auto-generated method stub
 			try {// 获得图片
-				Toast.makeText(MainActivity.this, "截屏",
-						Toast.LENGTH_LONG).show();
-				Bitmap bm = BitmapFactory.decodeByteArray(data, 0,
-						data.length);
+
+				Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
 				Log.e(TAG, "bm=" + bm);
 				myCamera.startPreview();// 开启预览
 				isClicked = false;
@@ -94,6 +97,8 @@ public class MainActivity extends Activity implements OnClickListener,
 		setContentView(R.layout.activity_main);
 		mySurface = (MySurfaceView) findViewById(R.id.my_camera);
 		tv_time = (TextView) findViewById(R.id.tv_time);
+		btn_change = (Button) findViewById(R.id.btn_change);
+		btn_change.setOnClickListener(this);
 		new Thread(new Runnable() {
 
 			@Override
@@ -122,8 +127,30 @@ public class MainActivity extends Activity implements OnClickListener,
 		mySurface.setMyCallBack(new MyCallBack() {
 
 			@Override
-			public void mySurfaceChanged() {
-				tv_time.setText(sdf.format(new Date()));
+			public void mySurfaceChanged(SurfaceHolder holder, int format,
+					int width, int height) {
+				if (true) {
+					return;
+				}
+				// 已经获得Surface的width和height，设置Camera的参数
+				Camera.Parameters parameters = myCamera.getParameters();
+				parameters.setPreviewSize(width, height);
+
+				List<Size> vSizeList = parameters.getSupportedPictureSizes();
+
+				for (int num = 0; num < vSizeList.size(); num++) {
+					Size vSize = vSizeList.get(num);
+				}
+				if (MainActivity.this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+					// 如果是竖屏
+					// parameters.set("orientation", "portrait");
+					// 在2.2以上可以使用
+					myCamera.setDisplayOrientation(90);
+				} else {
+					// parameters.set("orientation", "landscape");
+					// 在2.2以上可以使用
+					myCamera.setDisplayOrientation(0);
+				}
 			}
 
 			@Override
@@ -134,14 +161,30 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	@Override
-	public void onClick(View paramView) {
-		if (!isClicked) {
-			myCamera.autoFocus(this);// 自动对焦
-			isClicked = true;
-		} else {
-			myCamera.startPreview();// 开启预览
-			isClicked = false;
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.my_camera:
+			if (!isClicked) {
+				myCamera.autoFocus(this);// 自动对焦
+				isClicked = true;
+			} else {
+				myCamera.startPreview();// 开启预览
+				isClicked = false;
+			}
+			break;
+
+		case R.id.btn_change:
+			if (mySurface.FindFrontCamera()==-1) {
+				Toast.makeText(this, "无前置摄像头", Toast.LENGTH_SHORT).show();
+				return;
+			}
+			mySurface.changeCamera();
+			myCamera = mySurface.getMyCamera();
+			break;
+		default:
+			break;
 		}
+
 	}
 
 	private void saveImage(Bitmap bmp) {
@@ -151,7 +194,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		Paint paint = new Paint();
 		Log.e(TAG, "Bmp.getHeight()=" + Bmp.getHeight());
 		paint.setTextSize(Bmp.getHeight() / 20);
-		paint.setColor(Color.RED);
+		paint.setColor(Color.WHITE);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
 		Canvas canvas = new Canvas(Bmp);
@@ -213,13 +256,19 @@ public class MainActivity extends Activity implements OnClickListener,
 
 	@Override
 	public void onAutoFocus(boolean paramBoolean, Camera paramCamera) {
-		if (paramBoolean) {
+		Log.e(TAG, "对焦结果：" + paramBoolean);
+		if (paramBoolean || (!mySurface.getIsBackCamera())) {
+			Toast.makeText(this, "截屏", Toast.LENGTH_SHORT).show();
 			// 设置参数,并拍照
 			Camera.Parameters params = myCamera.getParameters();
 			params.setPictureFormat(PixelFormat.JPEG);
 			params.setPreviewSize(imageW, imageH);
 			myCamera.setParameters(params);
 			myCamera.takePicture(null, null, jpeg);
+		} else {
+			Toast.makeText(this, "对焦失败，请重新拍照！", Toast.LENGTH_SHORT).show();
+			myCamera.startPreview();// 开启预览
+			isClicked = false;
 		}
 	}
 

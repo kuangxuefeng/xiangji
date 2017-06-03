@@ -22,8 +22,16 @@
         android:textSize="30sp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="#FF0000"
+        android:textColor="#FFFFFF"
         android:gravity="center"
         android:text="2017" />
+
+    <Button
+        android:id="@+id/btn_change"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="切换" />
 
 </RelativeLayout>
