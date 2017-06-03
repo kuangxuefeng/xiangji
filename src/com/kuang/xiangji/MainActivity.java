@@ -8,7 +8,6 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -30,7 +29,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.Display;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -60,6 +58,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	boolean isClicked = false;// 是否点击标识
 	private TextView tv_time;
 	private Button btn_change, btn_photo;
+	private float myAlpha = 0.2f;
 	
 	public String[] allFiles;
 	private String SCAN_PATH;
@@ -107,6 +106,8 @@ public class MainActivity extends Activity implements OnClickListener,
 		setContentView(R.layout.activity_main);
 		mySurface = (MySurfaceView) findViewById(R.id.my_camera);
 		tv_time = (TextView) findViewById(R.id.tv_time);
+		tv_time.setAlpha(myAlpha);
+		
 		btn_change = (Button) findViewById(R.id.btn_change);
 		btn_change.setOnClickListener(this);
 		
@@ -258,6 +259,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		Log.e(TAG, "Bmp.getHeight()=" + bmpCopy.getHeight());
 		paint.setTextSize(bmpCopy.getHeight() / 20);
 		paint.setColor(Color.WHITE);
+		paint.setAlpha((int)(255 * myAlpha));
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
 		
