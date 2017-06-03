@@ -24,6 +24,9 @@ import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
+import android.media.MediaScannerConnection;
+import android.media.MediaScannerConnection.MediaScannerConnectionClient;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -40,11 +43,11 @@ import android.widget.Toast;
 import com.kuang.xiangji.MySurfaceView.MyCallBack;
 
 public class MainActivity extends Activity implements OnClickListener,
-		AutoFocusCallback {
+		AutoFocusCallback, MediaScannerConnectionClient {
 	private static final String TAG = "MainActivity";
 
 	SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	SimpleDateFormat sdfFile = new SimpleDateFormat("yyyyMMddHHmmss");
+	SimpleDateFormat sdfFile = new SimpleDateFormat("MMddHHmmss");
 
 	// (176*144,320*240,352*288,480*360,640*480)
 	private int imageW = 640;
@@ -57,6 +60,11 @@ public class MainActivity extends Activity implements OnClickListener,
 	boolean isClicked = false;// 是否点击标识
 	private TextView tv_time;
 	private Button btn_change, btn_photo;
+	
+	public String[] allFiles;
+	private String SCAN_PATH;
+	private static final String FILE_TYPE = "image/*";
+	private MediaScannerConnection conn;
 
 	/**
 	 * 预览的参数：myParameters.setPreviewSize(1280, 720）
@@ -209,13 +217,32 @@ public class MainActivity extends Activity implements OnClickListener,
 			break;
 			
 		case R.id.btn_photo:
-			Intent intent=new Intent();
-	        //制定内容的类型为图像
-	        intent.setType("image/*");
-	        //制定调用系统内容的action
-	        intent.setAction(Intent.ACTION_GET_CONTENT);
-	        //显示系统相册
-	        startActivityForResult(intent, 0);
+//			Intent intent=new Intent(Intent.ACTION_VIEW);
+//	        File picFile = new File(getBasePath());
+//			//制定内容的类型为图像
+////			intent.setDataAndType(Uri.fromFile(picFile), "image/*");
+//			intent.setData(Uri.fromFile(picFile));
+//	        //制定调用系统内容的action
+////	        intent.setAction(Intent.ACTION_GET_CONTENT);
+//	        //显示系统相册
+//	        startActivity(intent);
+			
+//			Intent in = new Intent(this, SDCARD123Activity.class);
+//			in.putExtra(SDCARD123Activity.key_path, getBasePath());
+//			startActivity(in);
+			
+			String path = getBasePath();
+
+			File folder = new File(path);
+			allFiles = folder.list();
+
+			if (null == allFiles || allFiles.length < 1) {
+				Toast.makeText(this, "无截图", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			SCAN_PATH = path + "/" + allFiles[allFiles.length - 1];
+			startScan();
 			break;
 		default:
 			break;
@@ -258,7 +285,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		try {
 			File path = new File(SavePath);
 			// 文件
-			String filepath = SavePath + "/ScreenIm_"
+			String filepath = SavePath + "/img_"
 					+ sdfFile.format(new Date()) + ".jpg";
 			File file = new File(filepath);
 			if (!path.exists()) {
@@ -325,5 +352,32 @@ public class MainActivity extends Activity implements OnClickListener,
 
 	private String getTimeString() {
 		return "测试(作者：风)： " + sdf.format(new Date());
+	}
+
+	private void startScan() {
+		if (conn != null) {
+			conn.disconnect();
+		}
+		conn = new MediaScannerConnection(this, this);
+		conn.connect();
+	}
+
+	@Override
+	public void onMediaScannerConnected() {
+		conn.scanFile(SCAN_PATH, FILE_TYPE);
+	}
+
+	@Override
+	public void onScanCompleted(String path, Uri uri) {
+		try {
+			if (uri != null) {
+				Intent intent = new Intent(Intent.ACTION_VIEW);// 改成Intent.ACTION_PICK的话，就是正常的打开所有图片的图库
+				intent.setData(uri);
+				startActivity(intent);
+			}
+		} finally {
+			conn.disconnect();
+			conn = null;
+		}
 	}
 }

@@ -14,6 +14,8 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
+        public static final int btn_change=0x7f060003;
+        public static final int btn_photo=0x7f060004;
         public static final int my_camera=0x7f060000;
         public static final int tv_no_camera=0x7f060001;
         public static final int tv_time=0x7f060002;
