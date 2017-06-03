@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
@@ -54,7 +56,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	String filePath = "/sdcard/wjh.jpg";// 照片保存路径
 	boolean isClicked = false;// 是否点击标识
 	private TextView tv_time;
-	private Button btn_change;
+	private Button btn_change, btn_photo;
 
 	/**
 	 * 预览的参数：myParameters.setPreviewSize(1280, 720）
@@ -92,13 +94,16 @@ public class MainActivity extends Activity implements OnClickListener,
 						| WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 						| WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+//		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
 		mySurface = (MySurfaceView) findViewById(R.id.my_camera);
 		tv_time = (TextView) findViewById(R.id.tv_time);
 		btn_change = (Button) findViewById(R.id.btn_change);
 		btn_change.setOnClickListener(this);
+		
+		btn_photo = (Button) findViewById(R.id.btn_photo);
+		btn_photo.setOnClickListener(this);
 		new Thread(new Runnable() {
 
 			@Override
@@ -155,6 +160,17 @@ public class MainActivity extends Activity implements OnClickListener,
 
 			@Override
 			public void mySurfaceCreated(Camera myCamera) {
+				
+				if (MainActivity.this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+					// 如果是竖屏
+					// parameters.set("orientation", "portrait");
+					// 在2.2以上可以使用
+					myCamera.setDisplayOrientation(90);
+				} else {
+					// parameters.set("orientation", "landscape");
+					// 在2.2以上可以使用
+					myCamera.setDisplayOrientation(0);
+				}
 				MainActivity.this.myCamera = myCamera;
 			}
 		});
@@ -180,6 +196,26 @@ public class MainActivity extends Activity implements OnClickListener,
 			}
 			mySurface.changeCamera();
 			myCamera = mySurface.getMyCamera();
+			if (MainActivity.this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
+				// 如果是竖屏
+				// parameters.set("orientation", "portrait");
+				// 在2.2以上可以使用
+				myCamera.setDisplayOrientation(90);
+			} else {
+				// parameters.set("orientation", "landscape");
+				// 在2.2以上可以使用
+				myCamera.setDisplayOrientation(0);
+			}
+			break;
+			
+		case R.id.btn_photo:
+			Intent intent=new Intent();
+	        //制定内容的类型为图像
+	        intent.setType("image/*");
+	        //制定调用系统内容的action
+	        intent.setAction(Intent.ACTION_GET_CONTENT);
+	        //显示系统相册
+	        startActivityForResult(intent, 0);
 			break;
 		default:
 			break;
@@ -188,18 +224,33 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private void saveImage(Bitmap bmp) {
-		Bitmap Bmp = Bitmap.createBitmap(imageW, imageH, Config.ARGB_8888);
-		Bmp = bmp.copy(Config.ARGB_8888, true);
+		Bitmap bmpCopy = Bitmap.createBitmap(imageW, imageH, Config.ARGB_8888);
+		bmpCopy = bmp.copy(Config.ARGB_8888, true);
 
 		Paint paint = new Paint();
-		Log.e(TAG, "Bmp.getHeight()=" + Bmp.getHeight());
-		paint.setTextSize(Bmp.getHeight() / 20);
+		Log.e(TAG, "Bmp.getHeight()=" + bmpCopy.getHeight());
+		paint.setTextSize(bmpCopy.getHeight() / 20);
 		paint.setColor(Color.WHITE);
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-		Canvas canvas = new Canvas(Bmp);
-		canvas.drawText(getTimeString(), Bmp.getWidth() / 2,
-				Bmp.getHeight() / 2, paint);
+		
+		// 定义矩阵对象  
+        Matrix matrix = new Matrix();  
+        // 缩放原图  
+        matrix.postScale(1f, 1f);  
+        // 参数为正则向右旋转
+        if (mySurface.getIsBackCamera()) {
+        	matrix.postRotate(90);  
+		}else{
+			matrix.postRotate(-90);
+		}
+        //bmp.getWidth(), 500分别表示重绘后的位图宽高  
+        Bitmap dstbmp = Bitmap.createBitmap(bmpCopy, 0, 0, bmpCopy.getWidth(), bmpCopy.getHeight(),  
+                matrix, true); 
+        Canvas canvas = new Canvas(dstbmp);
+		
+		canvas.drawText(getTimeString(), dstbmp.getWidth() / 2,
+				dstbmp.getHeight() / 2, paint);
 
 		String SavePath = getBasePath();
 
@@ -208,7 +259,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			File path = new File(SavePath);
 			// 文件
 			String filepath = SavePath + "/ScreenIm_"
-					+ sdfFile.format(new Date()) + ".png";
+					+ sdfFile.format(new Date()) + ".jpg";
 			File file = new File(filepath);
 			if (!path.exists()) {
 				path.mkdirs();
@@ -220,7 +271,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			FileOutputStream fos = null;
 			fos = new FileOutputStream(file);
 			if (null != fos) {
-				Bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+				dstbmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
 				fos.flush();
 				fos.close();
 
@@ -234,7 +285,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private String getBasePath() {
-		String savePath = getSDCardPath() + "/feng/ScreenImage";
+		String savePath = getSDCardPath() + "/DCIM/Camera";///feng/ScreenImage  camera
 		return savePath;
 	}
 
