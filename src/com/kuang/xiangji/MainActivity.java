@@ -8,6 +8,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -19,6 +20,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.Typeface;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
@@ -58,7 +60,9 @@ public class MainActivity extends Activity implements OnClickListener,
 	boolean isClicked = false;// 是否点击标识
 	private TextView tv_time;
 	private Button btn_change, btn_photo;
-	private float myAlpha = 0.2f;
+	private float myAlpha = 1f;
+	
+	private Typeface tf = null;
 	
 	public String[] allFiles;
 	private String SCAN_PATH;
@@ -104,8 +108,13 @@ public class MainActivity extends Activity implements OnClickListener,
 //		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
+		
+		AssetManager as = this.getAssets();
+		tf = Typeface.createFromAsset(as, "xiangsu.TTF");
+		
 		mySurface = (MySurfaceView) findViewById(R.id.my_camera);
 		tv_time = (TextView) findViewById(R.id.tv_time);
+		tv_time.setTypeface(tf);
 		tv_time.setAlpha(myAlpha);
 		
 		btn_change = (Button) findViewById(R.id.btn_change);
@@ -259,6 +268,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		Log.e(TAG, "Bmp.getHeight()=" + bmpCopy.getHeight());
 		paint.setTextSize(bmpCopy.getHeight() / 20);
 		paint.setColor(Color.WHITE);
+		paint.setTypeface(tf);
 		paint.setAlpha((int)(255 * myAlpha));
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
