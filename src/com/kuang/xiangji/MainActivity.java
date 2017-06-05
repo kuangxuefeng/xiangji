@@ -60,7 +60,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	SurfaceHolder holder;// surfaceHolder声明
 	Camera myCamera;// 相机声明
 	String filePath = "/sdcard/wjh.jpg";// 照片保存路径
-	boolean isClicked = false;// 是否点击标识
+//	boolean isClicked = false;// 是否点击标识
 	private TextView tv_time;
 	private ImageView iv_change, iv_photo, iv_pai;
 	private float myAlpha = 1f;
@@ -91,10 +91,8 @@ public class MainActivity extends Activity implements OnClickListener,
 				Bitmap bm = BitmapFactory.decodeByteArray(data, 0, data.length);
 				Log.e(TAG, "bm=" + bm);
 				myCamera.startPreview();// 开启预览
-				isClicked = false;
-				initImage();
-
 				saveImage(bm);
+				initImage();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -364,7 +362,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private String getBasePath() {
-		String savePath = getSDCardPath() + "/DCIM/Camera";// /feng/ScreenImage
+		String savePath = getSDCardPath() + "/DCIM/feng";// /feng/ScreenImage  /DCIM/Camera
 															// camera
 		return savePath;
 	}
@@ -399,7 +397,6 @@ public class MainActivity extends Activity implements OnClickListener,
 		} else {
 			Toast.makeText(this, "对焦失败，请重新拍照！", Toast.LENGTH_SHORT).show();
 			myCamera.startPreview();// 开启预览
-			isClicked = false;
 		}
 	}
 
@@ -429,8 +426,12 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private void startScan() {
-		if (conn != null) {
-			conn.disconnect();
+		try {
+			if (conn != null) {
+				conn.disconnect();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		conn = new MediaScannerConnection(this, this);
 		conn.connect();
@@ -449,6 +450,12 @@ public class MainActivity extends Activity implements OnClickListener,
 				intent.setData(uri);
 				startActivity(intent);
 			}
+		} catch(Exception e){
+			Log.e(TAG, "ACTION_VIEW  Exception");
+			e.printStackTrace();
+			Intent intent = new Intent(Intent.ACTION_VIEW);// 改成Intent.ACTION_PICK的话，就是正常的打开所有图片的图库
+			intent.setData(Uri.fromFile(new File(SCAN_PATH)));
+			startActivity(intent);
 		} finally {
 			conn.disconnect();
 			conn = null;
@@ -456,21 +463,30 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private void initImage() {
-		runOnUiThread(new Runnable() {
-			
-			@Override
-			public void run() {
-				String path = getBasePath();
-				File folder = new File(path);
-				allFiles = folder.list();
-				if (null == allFiles || allFiles.length < 1) {
-					return;
-				} else {
-					File picFile = new File(path + "/" + allFiles[allFiles.length - 1]);
-					Uri uri = Uri.fromFile(picFile);
-					iv_photo.setImageURI(uri);
-				}
-			}
-		});
+//		runOnUiThread(new Runnable() {
+//			@Override
+//			public void run() {
+//				
+//			}
+//		});
+		String path = getBasePath();
+		File folder = new File(path);
+		allFiles = folder.list();
+		if (null == allFiles || allFiles.length < 1) {
+			Log.e(TAG, "null == allFiles || allFiles.length < 1");
+			return;
+		} else {
+			File picFile = new File(path + "/" + allFiles[allFiles.length - 1]);
+			Uri uri = Uri.fromFile(picFile);
+			iv_photo.setImageURI(uri);
+		}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		if (conn != null) {
+			conn.disconnect();
+		}
+		super.onDestroy();
 	}
 }
