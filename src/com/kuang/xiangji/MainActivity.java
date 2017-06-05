@@ -60,7 +60,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	SurfaceHolder holder;// surfaceHolder声明
 	Camera myCamera;// 相机声明
 	String filePath = "/sdcard/wjh.jpg";// 照片保存路径
-//	boolean isClicked = false;// 是否点击标识
+	// boolean isClicked = false;// 是否点击标识
 	private TextView tv_time;
 	private ImageView iv_change, iv_photo, iv_pai;
 	private float myAlpha = 1f;
@@ -111,7 +111,6 @@ public class MainActivity extends Activity implements OnClickListener,
 		// this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
-
 
 		AssetManager as = this.getAssets();
 		tf = Typeface.createFromAsset(as, "xiangsu.TTF");
@@ -362,7 +361,8 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private String getBasePath() {
-		String savePath = getSDCardPath() + "/DCIM/feng";// /feng/ScreenImage  /DCIM/Camera
+		String savePath = getSDCardPath() + "/DCIM/feng";// /feng/ScreenImage
+															// /DCIM/Camera
 															// camera
 		return savePath;
 	}
@@ -426,6 +426,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private void startScan() {
+		Log.e(TAG, "startScan");
 		try {
 			if (conn != null) {
 				conn.disconnect();
@@ -439,23 +440,22 @@ public class MainActivity extends Activity implements OnClickListener,
 
 	@Override
 	public void onMediaScannerConnected() {
+		Log.e(TAG, "onMediaScannerConnected");
 		conn.scanFile(SCAN_PATH, FILE_TYPE);
 	}
 
 	@Override
 	public void onScanCompleted(String path, Uri uri) {
+		Log.e(TAG, "onScanCompleted uri=" + uri);
 		try {
 			if (uri != null) {
 				Intent intent = new Intent(Intent.ACTION_VIEW);// 改成Intent.ACTION_PICK的话，就是正常的打开所有图片的图库
 				intent.setData(uri);
 				startActivity(intent);
 			}
-		} catch(Exception e){
+		} catch (Exception e) {
 			Log.e(TAG, "ACTION_VIEW  Exception");
 			e.printStackTrace();
-			Intent intent = new Intent(Intent.ACTION_VIEW);// 改成Intent.ACTION_PICK的话，就是正常的打开所有图片的图库
-			intent.setData(Uri.fromFile(new File(SCAN_PATH)));
-			startActivity(intent);
 		} finally {
 			conn.disconnect();
 			conn = null;
@@ -463,12 +463,12 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private void initImage() {
-//		runOnUiThread(new Runnable() {
-//			@Override
-//			public void run() {
-//				
-//			}
-//		});
+		// runOnUiThread(new Runnable() {
+		// @Override
+		// public void run() {
+		//
+		// }
+		// });
 		String path = getBasePath();
 		File folder = new File(path);
 		allFiles = folder.list();
@@ -481,7 +481,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			iv_photo.setImageURI(uri);
 		}
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		if (conn != null) {
