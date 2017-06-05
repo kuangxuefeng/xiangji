@@ -11,35 +11,44 @@
 
     <TextView
         android:id="@+id/tv_no_camera"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="未检查到本地有摄像头" />
-    
+        android:text="未检查到本地有摄像头"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/tv_time"
-        android:textSize="30sp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="#FFFFFF"
         android:gravity="center"
-        android:text="2017" />
+        android:text="2017"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp" />
 
-    <Button
-        android:id="@+id/btn_change"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="switch" />
+    <ImageView
+        android:id="@+id/iv_pai"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/camera_c" />
 
-    <Button
-        android:id="@+id/btn_photo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="photo" />
+    <ImageView
+        android:id="@+id/iv_change"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="35dp"
+        android:layout_toLeftOf="@+id/iv_pai"
+        android:src="@drawable/camera_swith" />
+
+    <ImageView
+        android:id="@+id/iv_photo"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="35dp"
+        android:layout_toRightOf="@+id/iv_pai" />
 
 </RelativeLayout>

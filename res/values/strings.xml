@@ -3,5 +3,6 @@
 
     <string name="app_name">xiangji</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_show_info">ShowInfoActivity</string>
 
 </resources>

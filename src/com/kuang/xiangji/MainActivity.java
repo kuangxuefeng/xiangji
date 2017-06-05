@@ -2,6 +2,8 @@ package com.kuang.xiangji;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +39,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,11 +62,12 @@ public class MainActivity extends Activity implements OnClickListener,
 	String filePath = "/sdcard/wjh.jpg";// 照片保存路径
 	boolean isClicked = false;// 是否点击标识
 	private TextView tv_time;
-	private Button btn_change, btn_photo;
+	private ImageView iv_change, iv_photo, iv_pai;
 	private float myAlpha = 1f;
-	
+
 	private Typeface tf = null;
-	
+	private static final long dateOut = 20170615L;
+
 	public String[] allFiles;
 	private String SCAN_PATH;
 	private static final String FILE_TYPE = "image/*";
@@ -88,6 +92,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				Log.e(TAG, "bm=" + bm);
 				myCamera.startPreview();// 开启预览
 				isClicked = false;
+				initImage();
 
 				saveImage(bm);
 			} catch (Exception e) {
@@ -105,23 +110,29 @@ public class MainActivity extends Activity implements OnClickListener,
 						| WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 						| WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		// this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
-		
+
+		checkDate();
+
 		AssetManager as = this.getAssets();
 		tf = Typeface.createFromAsset(as, "xiangsu.TTF");
-		
+
 		mySurface = (MySurfaceView) findViewById(R.id.my_camera);
 		tv_time = (TextView) findViewById(R.id.tv_time);
 		tv_time.setTypeface(tf);
 		tv_time.setAlpha(myAlpha);
-		
-		btn_change = (Button) findViewById(R.id.btn_change);
-		btn_change.setOnClickListener(this);
-		
-		btn_photo = (Button) findViewById(R.id.btn_photo);
-		btn_photo.setOnClickListener(this);
+
+		iv_change = (ImageView) findViewById(R.id.iv_change);
+		iv_change.setOnClickListener(this);
+
+		iv_photo = (ImageView) findViewById(R.id.iv_photo);
+		iv_photo.setOnClickListener(this);
+
+		iv_pai = (ImageView) findViewById(R.id.iv_pai);
+		iv_pai.setOnClickListener(this);
+
 		new Thread(new Runnable() {
 
 			@Override
@@ -178,7 +189,7 @@ public class MainActivity extends Activity implements OnClickListener,
 
 			@Override
 			public void mySurfaceCreated(Camera myCamera) {
-				
+
 				if (MainActivity.this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
 					// 如果是竖屏
 					// parameters.set("orientation", "portrait");
@@ -192,23 +203,51 @@ public class MainActivity extends Activity implements OnClickListener,
 				MainActivity.this.myCamera = myCamera;
 			}
 		});
+		initImage();
+	}
+
+	private void checkDate() {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				long timeL = dateOut;
+				try {
+					timeL = Long.parseLong(getTimeCurr("yyyyMMdd"));
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
+				if (timeL >= dateOut) {
+					runOnUiThread(new Runnable() {
+						public void run() {
+							Intent intent = new Intent(MainActivity.this,
+									ShowInfoActivity.class);
+							startActivity(intent);
+							finish();
+						}
+					});
+				}
+			}
+		}).start();
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.my_camera:
-			if (!isClicked) {
-				myCamera.autoFocus(this);// 自动对焦
-				isClicked = true;
-			} else {
-				myCamera.startPreview();// 开启预览
-				isClicked = false;
-			}
+		case R.id.iv_pai:
+			myCamera.autoFocus(this);// 自动对焦
+			// if (!isClicked) {
+			// myCamera.autoFocus(this);// 自动对焦
+			// isClicked = true;
+			// } else {
+			// myCamera.startPreview();// 开启预览
+			// isClicked = false;
+			// }
 			break;
 
-		case R.id.btn_change:
-			if (mySurface.FindFrontCamera()==-1) {
+		case R.id.iv_change:
+			if (mySurface.FindFrontCamera() == -1) {
 				Toast.makeText(this, "无前置摄像头", Toast.LENGTH_SHORT).show();
 				return;
 			}
@@ -225,22 +264,22 @@ public class MainActivity extends Activity implements OnClickListener,
 				myCamera.setDisplayOrientation(0);
 			}
 			break;
-			
-		case R.id.btn_photo:
-//			Intent intent=new Intent(Intent.ACTION_VIEW);
-//	        File picFile = new File(getBasePath());
-//			//制定内容的类型为图像
-////			intent.setDataAndType(Uri.fromFile(picFile), "image/*");
-//			intent.setData(Uri.fromFile(picFile));
-//	        //制定调用系统内容的action
-////	        intent.setAction(Intent.ACTION_GET_CONTENT);
-//	        //显示系统相册
-//	        startActivity(intent);
-			
-//			Intent in = new Intent(this, SDCARD123Activity.class);
-//			in.putExtra(SDCARD123Activity.key_path, getBasePath());
-//			startActivity(in);
-			
+
+		case R.id.iv_photo:
+			// Intent intent=new Intent(Intent.ACTION_VIEW);
+			// File picFile = new File(getBasePath());
+			// //制定内容的类型为图像
+			// // intent.setDataAndType(Uri.fromFile(picFile), "image/*");
+			// intent.setData(Uri.fromFile(picFile));
+			// //制定调用系统内容的action
+			// // intent.setAction(Intent.ACTION_GET_CONTENT);
+			// //显示系统相册
+			// startActivity(intent);
+
+			// Intent in = new Intent(this, SDCARD123Activity.class);
+			// in.putExtra(SDCARD123Activity.key_path, getBasePath());
+			// startActivity(in);
+
 			String path = getBasePath();
 
 			File folder = new File(path);
@@ -269,25 +308,25 @@ public class MainActivity extends Activity implements OnClickListener,
 		paint.setTextSize(bmpCopy.getHeight() / 20);
 		paint.setColor(Color.WHITE);
 		paint.setTypeface(tf);
-		paint.setAlpha((int)(255 * myAlpha));
+		paint.setAlpha((int) (255 * myAlpha));
 		paint.setTextAlign(Paint.Align.CENTER);
 		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
-		
-		// 定义矩阵对象  
-        Matrix matrix = new Matrix();  
-        // 缩放原图  
-        matrix.postScale(1f, 1f);  
-        // 参数为正则向右旋转
-        if (mySurface.getIsBackCamera()) {
-        	matrix.postRotate(90);  
-		}else{
+
+		// 定义矩阵对象
+		Matrix matrix = new Matrix();
+		// 缩放原图
+		matrix.postScale(1f, 1f);
+		// 参数为正则向右旋转
+		if (mySurface.getIsBackCamera()) {
+			matrix.postRotate(90);
+		} else {
 			matrix.postRotate(-90);
 		}
-        //bmp.getWidth(), 500分别表示重绘后的位图宽高  
-        Bitmap dstbmp = Bitmap.createBitmap(bmpCopy, 0, 0, bmpCopy.getWidth(), bmpCopy.getHeight(),  
-                matrix, true); 
-        Canvas canvas = new Canvas(dstbmp);
-		
+		// bmp.getWidth(), 500分别表示重绘后的位图宽高
+		Bitmap dstbmp = Bitmap.createBitmap(bmpCopy, 0, 0, bmpCopy.getWidth(),
+				bmpCopy.getHeight(), matrix, true);
+		Canvas canvas = new Canvas(dstbmp);
+
 		canvas.drawText(getTimeString(), dstbmp.getWidth() / 2,
 				dstbmp.getHeight() / 2, paint);
 
@@ -297,8 +336,8 @@ public class MainActivity extends Activity implements OnClickListener,
 		try {
 			File path = new File(SavePath);
 			// 文件
-			String filepath = SavePath + "/img_"
-					+ sdfFile.format(new Date()) + ".jpg";
+			String filepath = SavePath + "/img_" + sdfFile.format(new Date())
+					+ ".jpg";
 			File file = new File(filepath);
 			if (!path.exists()) {
 				path.mkdirs();
@@ -324,7 +363,8 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private String getBasePath() {
-		String savePath = getSDCardPath() + "/DCIM/Camera";///feng/ScreenImage  camera
+		String savePath = getSDCardPath() + "/DCIM/Camera";// /feng/ScreenImage
+															// camera
 		return savePath;
 	}
 
@@ -363,7 +403,28 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private String getTimeString() {
-		return "测试(作者：风)： " + sdf.format(new Date());
+		return "EXP " + sdf.format(new Date());
+	}
+
+	private String getTimeCurr(String format) {
+		URLConnection uc = null;
+		Date date = null;
+		try {
+			URL url = new URL("http://www.baidu.com");// 取得资源对象
+			uc = url.openConnection();
+			uc.connect(); // 发出连接
+			long ld = uc.getDate(); // 取得网站日期时间
+			date = new Date(ld); // 转换为标准时间对象
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (null == date) {
+			date = new Date();
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		String re = sdf.format(date);
+		Log.e(TAG, "re=" + re);
+		return re;
 	}
 
 	private void startScan() {
@@ -391,5 +452,24 @@ public class MainActivity extends Activity implements OnClickListener,
 			conn.disconnect();
 			conn = null;
 		}
+	}
+
+	private void initImage() {
+		runOnUiThread(new Runnable() {
+			
+			@Override
+			public void run() {
+				String path = getBasePath();
+				File folder = new File(path);
+				allFiles = folder.list();
+				if (null == allFiles || allFiles.length < 1) {
+					return;
+				} else {
+					File picFile = new File(path + "/" + allFiles[allFiles.length - 1]);
+					Uri uri = Uri.fromFile(picFile);
+					iv_photo.setImageURI(uri);
+				}
+			}
+		});
 	}
 }
