@@ -28,10 +28,11 @@
 
     <ImageView
         android:id="@+id/iv_pai"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
         android:src="@drawable/camera_c" />
 
     <ImageView
@@ -40,6 +41,7 @@
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="35dp"
+        android:layout_marginBottom="20dp"
         android:layout_toLeftOf="@+id/iv_pai"
         android:src="@drawable/camera_swith" />
 
@@ -48,6 +50,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"
         android:layout_marginLeft="35dp"
         android:layout_toRightOf="@+id/iv_pai" />
 

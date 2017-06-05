@@ -114,7 +114,6 @@ public class MainActivity extends Activity implements OnClickListener,
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
 
-		checkDate();
 
 		AssetManager as = this.getAssets();
 		tf = Typeface.createFromAsset(as, "xiangsu.TTF");
@@ -204,6 +203,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			}
 		});
 		initImage();
+		checkDate();
 	}
 
 	private void checkDate() {
@@ -266,6 +266,7 @@ public class MainActivity extends Activity implements OnClickListener,
 			break;
 
 		case R.id.iv_photo:
+			Log.e(TAG, "R.id.iv_photo");
 			// Intent intent=new Intent(Intent.ACTION_VIEW);
 			// File picFile = new File(getBasePath());
 			// //制定内容的类型为图像
