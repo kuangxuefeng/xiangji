@@ -66,7 +66,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	private float myAlpha = 1f;
 
 	private Typeface tf = null;
-	private static final long dateOut = 20170615L;
+	private static final long dateOut = 20170611L;
 
 	public String[] allFiles;
 	private String SCAN_PATH;
