@@ -49,7 +49,7 @@ public class MainActivity extends Activity implements OnClickListener,
 		AutoFocusCallback, MediaScannerConnectionClient {
 	private static final String TAG = "MainActivity";
 
-	SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/ddHH:mm:ss");
 	SimpleDateFormat sdfFile = new SimpleDateFormat("MMddHHmmss");
 
 	// (176*144,320*240,352*288,480*360,640*480)
@@ -401,7 +401,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private String getTimeString() {
-		return "EXP " + sdf.format(new Date());
+		return "EXP" + sdf.format(new Date());
 	}
 
 	private String getTimeCurr(String format) {
