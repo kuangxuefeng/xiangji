@@ -386,7 +386,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	@Override
 	public void onAutoFocus(boolean paramBoolean, Camera paramCamera) {
 		Log.e(TAG, "对焦结果：" + paramBoolean);
-		if (paramBoolean || (!mySurface.getIsBackCamera())) {
+		if (paramBoolean || (!mySurface.getIsBackCamera()) || true) {
 			Toast.makeText(this, "截屏", Toast.LENGTH_SHORT).show();
 			// 设置参数,并拍照
 			Camera.Parameters params = myCamera.getParameters();
