@@ -10,6 +10,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -67,6 +68,7 @@ public class MainActivity extends Activity implements OnClickListener,
 
 	private Typeface tf = null;
 	private static final long dateOut = 20170611L;
+	private static final String KEY_DATA_OUT = "key_data_out";
 
 	public String[] allFiles;
 	private String SCAN_PATH;
@@ -204,6 +206,15 @@ public class MainActivity extends Activity implements OnClickListener,
 	}
 
 	private void checkDate() {
+		final SharedPreferences sp = getPreferences(MODE_PRIVATE);
+		if (sp.getBoolean(KEY_DATA_OUT, false)) {
+			Log.e(TAG, "ÒÑÅÐ¶Ïµ½ÆÚ£¡");
+			Intent intent = new Intent(MainActivity.this,
+					ShowInfoActivity.class);
+			startActivity(intent);
+			finish();
+			return;
+		}
 		new Thread(new Runnable() {
 
 			@Override
@@ -217,6 +228,7 @@ public class MainActivity extends Activity implements OnClickListener,
 				if (timeL >= dateOut) {
 					runOnUiThread(new Runnable() {
 						public void run() {
+							sp.edit().putBoolean(KEY_DATA_OUT, true).commit();
 							Intent intent = new Intent(MainActivity.this,
 									ShowInfoActivity.class);
 							startActivity(intent);
