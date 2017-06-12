@@ -69,6 +69,7 @@ public class MainActivity extends Activity implements OnClickListener,
 	private Typeface tf = null;
 	private static final long dateOut = 20170611L;
 	private static final String KEY_DATA_OUT = "key_data_out";
+	private static final boolean checkDate = false;
 
 	public String[] allFiles;
 	private String SCAN_PATH;
@@ -202,7 +203,10 @@ public class MainActivity extends Activity implements OnClickListener,
 			}
 		});
 		initImage();
-		checkDate();
+
+		if (checkDate) {
+			checkDate();
+		}
 	}
 
 	private void checkDate() {
